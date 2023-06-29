@@ -15,14 +15,16 @@ const Signup = () => {
   const navigate = useNavigate();
   const [email, setemail] = useState("");
   const [password, setPassword] = useState("");
-  const[name,setname]=useState("");
-  var res=null;
-  const addUser = async ()=>{
+  const[name,setname]=useState(""); 
+  // var res=null;
+  const addUser = async (res)=>{
   try{
+    console.log("yeh response hai",res)
     const uid=res.user.uid;
     const email=res._tokenResponse.email;
     const name=res.displayName;
     const id=Date.now();
+    console.log("jo data aara hai",uid,name,email,id)
     const docRef=await addDoc(collection(db,"Users"),{
       uid:res.user.uid,
       name:res.displayName,
@@ -30,7 +32,7 @@ const Signup = () => {
       userid:Date.now()
     });
     dispatch(saveUserDetails({uid,email,name,id}))
-    console.log(docRef.id)
+    console.log("data add hua hai",docRef.id)
   }catch(err){
     console.log(err);
   }
@@ -47,10 +49,10 @@ const Signup = () => {
         navigate("/login")
       }
       else{
-      res = await createUserWithEmailAndPassword(auth, email, password);
+      const res = await createUserWithEmailAndPassword(auth, email, password);
       res.displayName=name;
       dispatch(doAuth());
-      await addUser();
+      await addUser(res);
       navigate("/login")
       }
     } catch (err) {
@@ -59,19 +61,21 @@ const Signup = () => {
   };
   const signingoogle = async () => {
     try {
-      const res = await signInWithPopup(auth, googleProvider);
-      console.log(res);
+       const res = await signInWithPopup(auth, googleProvider);
+      console.log("google se sign in krkre hai",res);
       dispatch(doAuth());
       dispatch(saveUsername(res._tokenResponse.email));
       const data =await getDocs(collection(db,"Users"))
       const users=data.docs.map((doc)=>({...doc.data(),id:doc.id}));
       const filteredData=users.filter((item)=> loggedInUserEmail===item.email);
-      console.log(filteredData.length)
+      console.log("yeh data hai",filteredData)
       if(filteredData.length>0){
       navigate("/home")
       }
       else{
-      await addUser();
+      // setTimeout(async()=>{
+        await addUser(res);
+      // },1000)
       navigate("/home")
       }
     } catch (err) {

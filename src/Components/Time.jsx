@@ -11,10 +11,10 @@ export const  getTime=(props)=> {
  }
  else if(diff===1)
  {
-  return 'Tomorrow';
+  return 'Yesterday';
  }
  else
  {
   return ''+date.getUTCDate()+'-'+date.getMonth()+'-'+date.getFullYear();
  }
-  }
+}
